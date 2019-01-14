@@ -4,6 +4,8 @@ import scirisweb as sw
 
 def three_letter_seq(sequence, thio_end5, thio_end3):
     s = ''
+    thio_end5 = int(thio_end5)
+    thio_end3 = int(thio_end3)
     if thio_end3 < 0: return ''
     for i in range(len(sequence)):
         if i == len(sequence) - 1: s = s + '-' + sequence[i] + ('r' if thio_end3 == 0 else 'm')
@@ -83,19 +85,20 @@ def read_sequence(s):
 
 
 def make_sequence(seq, thio_end5, thio_end3):
-    tls = three_letter_seq(seq, thio_end5.value, thio_end3.value)
+    tls = three_letter_seq(seq, thio_end5, thio_end3)
     print('Standard three letter sequence is: ')
     print(tls)
     return tls
 
 
 # Create the app
-app = sw.ScirisApp(__name__, name="RNASequenceConverter")
+app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181)
 
 # Define the API
-@app.route('/getoptions')
-def getoptions(tojson=True):
-    ''
+@app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
+def get_tls(sequence, fiveend, threeend):
+    tls = three_letter_seq(sequence, fiveend, threeend)
+    return tls
 
 
 # Run the server

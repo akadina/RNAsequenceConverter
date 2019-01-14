@@ -3,53 +3,64 @@
 
 <!-- Load core scripts -->
 <head>
-  <title>Google Trend Index</title>
+  <title>RNA Sequence Converter</title>
   <script src="https://unpkg.com/vue"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <link href='https://fonts.googleapis.com/css?family=Avenir' rel='stylesheet'>
   <style>
-  body {
+    body {
       font-family: 'Avenir';
       font-size: 0.8em;
-  }
+    }
 
-  .app {
-    padding: 20px;
-    justify-content: center;
-    display: flex;
-  }
+    .app {
+      padding: 20px;
+      justify-content: center;
+      display: flex;
+    }
 
-  .controls {
-    display: inline-block;
-    background-color: #f3f3f3;
-    padding: 20px;
-    border: solid 2px #aaa;
-  }
+    .controls {
+      display: inline-block;
+      background-color: #f3f3f3;
+      padding: 20px;
+      border: solid 2px #aaa;
+    }
   </style>
 </head>
 
 
 <!-- Define the layout -->
 <body>
-  <div id="app" class="app">
-    <div>
-      <h1>RNA sequence converter</h1>
-      <div class="controls">
-        <b>Disclaimer</b><br>
-          <p>This code is only meant to make Walker's and Nastia's lifes easier</p>
-          <p>Use it at your own risk. After running this, you may choose to compare the result to your manual conversion as this is severely undertested</p>
+<div id="app" class="app">
+  <div>
+    <h1>RNA sequence converter</h1>
+    <div class="controls">
+      <h2>Disclaimer</h2>
+      <p>This code is only meant to make Walker's and Nastia's lifes easier</p>
+      <p>Use it at your own risk. After running this, you may choose to compare the result to your manual conversion as this is severely undertested</p>
 
-          <b>Convert sequence</b>
-          <p>Convert an RNA sequence into a sequence that you can directly feed to the machine.</p>
-          <p>Note: only ACGTU are accepted. All T's will be converted to U</p>
-          <p>Enter a sequence below</p>
+      <h2>Convert sequence</h2>
+      <p>Convert an RNA sequence into a sequence that you can directly feed to the machine.</p>
+      <p>Note: only ACGTU are accepted. All T's will be converted to U</p>
+      <p>Enter a sequence below</p>
 
-          <b>Ends</b>
-          <p>Synthego standard RNA mods include 3 phosphate bridges at the 5'- and 3'-ends being thiophosphorylated</p>
-          <p>Currently we do not handle base modifications</p>
-      </div>
+      <input v-model="sequence" placeholder="Enter sequence">
+
+      <h2>Ends</h2>
+      <p>Synthego standard RNA mods include 3 phosphate bridges at the 5'- and 3'-ends being thiophosphorylated</p>
+      <p>Currently we do not handle base modifications</p>
+
+      <p>Thiophosphates & OMe at the 5'-end: <input v-model="fiveend" placeholder="0"></p>
+      <p>Thiophosphates & OMe at the 3'-end: <input v-model="threeend" placeholder="0"></p>
+
+      <h2>Copy your TLS</h2>
+      <p><button v-on:click="get_tls">Get my TLS</button></p>
+      <p>Standard three letter sequence is:</p>
+      <p>{{ tls }}</p>
+
     </div>
   </div>
+</div>
 </body>
 
 <!-- Define the functionality -->
@@ -59,27 +70,24 @@
 
     data() {
       return {
-          trendselection: 'Travel',
-          trendoptions: [],
-          startdate: new Date(2007, 0, 1),
-          enddate: new Date(2017, 6, 31),
-          trendline: false,
-        }
-      },
+        sequence: '',
+        fiveend: 0,
+        threeend: 0,
+        tls: 'No TLS'
+      }
+    },
 
 
     methods: {
-      plotdata: function () {
-        var url = 'http://localhost:8080/api/plotdata'
-        url += '/' + vm.trendselection
-        url += '/' + vm.startdate.toISOString().substring(0, 10)
-        url += '/' + vm.enddate.toISOString().substring(0, 10)
-        url += '/' + vm.trendline
+      get_tls: function () {
+        var url = 'http://localhost:8080/api/get_tls';
+        url += '/' + vm.sequence;
+        url += '/' + vm.fiveend;
+        url += '/' + vm.threeend;
         axios.post(url) // Use a POST request to pass along the value.
-        .then(function (response) {
-          document.getElementById('trend').innerHTML = ''; // Clear the DOM before redrawing
-          mpld3.draw_figure('trend', response.data);
-        })
+                .then(function (response) {
+                  vm.tls = response.data
+                })
       },
     }
   })
