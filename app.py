@@ -1,0 +1,103 @@
+# Imports
+import scirisweb as sw
+
+
+def three_letter_seq(sequence, thio_end5, thio_end3):
+    s = ''
+    if thio_end3 < 0: return ''
+    for i in range(len(sequence)):
+        if i == len(sequence) - 1: s = s + '-' + sequence[i] + ('r' if thio_end3 == 0 else 'm')
+        elif i < thio_end5: s = s + '-' + sequence[i] + 'ms'
+        elif i > (len(sequence) - thio_end3 - 1): s = s + '-' + sequence[i] + 'ms'
+        else: s = s + '-' + sequence[i] + 'ro'
+    return s
+
+def single_insertion(tls, pos1, pos2, base, twoprime='r', thio=False):
+    #just in case user swapped pos1 and pos2
+    if pos2 < pos1: pos1, pos2 = pos2, pos1
+    # because Python is zero-based and humans are one-based
+    pos1, pos2 = pos1 - 1, pos2 - 1
+    if pos2 - pos1 != 1:
+        print('No insertion has been made.')
+        print('Positions entered are not consecutive')
+        return(tls)
+    
+    elif pos1 < -1 or pos1 > len(tls) / 4:
+        print('No insertion has been made.')
+        print('Cannot insert there')
+        return(tls)
+    
+    elif base not in 'ACGUX':
+        print('No insertion has been made.')
+        print('Base not valid')
+        return(tls)
+    
+    two_prime_abbs = {'OH': 'r', 'Methyl': 'm', 'Fluoro': 'f'}
+    
+    if pos1 == len(tls) / 4: mod = '-' + base + two_prime_abbs[twoprime]
+    else: mod = '-' + base + two_prime_abbs[twoprime] + ('o' if thio == False else 's')
+    modified_tls = tls[:((pos1 + 1) * 4)] + mod + tls[(pos1 + 1) * 4:]
+    return modified_tls
+
+def single_replacement(tls, pos, base, twoprime='r', thio=False):
+
+    # because Python is zero-based and humans are one-based
+    pos -= 1
+    
+    if pos < 0 or pos > len(tls) / 4:
+        print('No replacement has been made.')
+        print('Cannot replace base that does not exist.')
+        return(tls)
+    
+    elif base not in 'ACGUX':
+        print('No replacement has been made.')
+        print('Base not valid')
+        return(tls)
+    
+    two_prime_abbs = {'OH': 'r', 'Methyl': 'm', 'Fluoro': 'f'}
+    
+    if pos == len(tls) / 4: mod = '-' + base + two_prime_abbs[twoprime]
+        
+    else: mod = '-' + base + two_prime_abbs[twoprime] + ('o' if thio == False else 's')
+    modified_tls = tls[:((pos) * 4)] + mod + tls[(pos + 1) * 4:]
+    return modified_tls
+
+
+def read_sequence(s):
+    #read sequence. Ensure no errors (AGCU) If any T's - convert to U's
+    sequence = s.upper()
+    seq = ''
+    flag = 1
+    for i in range(len(sequence)):
+        if sequence[i] not in 'ACGTU':
+            flag = 0
+            break
+        if sequence[i] == 'T': seq += 'U'
+        else: seq += sequence[i]
+    
+    if flag != 0:
+        print(seq)
+        print("Sequence length: " + str(len(seq)))
+    else: print('Sequence not valid')
+    return sequence
+
+
+def make_sequence(seq, thio_end5, thio_end3):
+    tls = three_letter_seq(seq, thio_end5.value, thio_end3.value)
+    print('Standard three letter sequence is: ')
+    print(tls)
+    return tls
+
+
+# Create the app
+app = sw.ScirisApp(__name__, name="RNASequenceConverter")
+
+# Define the API
+@app.route('/getoptions')
+def getoptions(tojson=True):
+    ''
+
+
+# Run the server
+if __name__ == "__main__":
+    app.run()
