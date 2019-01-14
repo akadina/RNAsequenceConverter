@@ -77,14 +77,13 @@
       }
     },
 
-
     methods: {
       get_tls: function () {
-        var url = 'http://localhost:8080/api/get_tls';
+        var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
         url += '/' + vm.threeend;
-        axios.post(url) // Use a POST request to pass along the value.
+        axios.post(url) // Use a POST request to pass along the value -- this will be simplified in future!
                 .then(function (response) {
                   vm.tls = response.data
                 })

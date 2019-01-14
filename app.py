@@ -1,6 +1,9 @@
 # Imports
 import scirisweb as sw
 
+#####################
+#%% Code part
+#####################
 
 def three_letter_seq(sequence, thio_end5, thio_end3):
     s = ''
@@ -91,15 +94,18 @@ def make_sequence(seq, thio_end5, thio_end3):
     return tls
 
 
+#####################
+#%% Webapp part
+#####################
+
 # Create the app
-app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181)
+app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Set to a nonstandard port to avoid collisions
 
 # Define the API
 @app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
 def get_tls(sequence, fiveend, threeend):
     tls = three_letter_seq(sequence, fiveend, threeend)
     return tls
-
 
 # Run the server
 if __name__ == "__main__":
