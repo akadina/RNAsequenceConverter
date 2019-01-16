@@ -102,20 +102,21 @@ def make_sequence(seq, thio_end5, thio_end3):
 app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Set to a nonstandard port to avoid collisions
 
 # Define the API
-@app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
+@app.route('/get_tls/<sequence>/<fiveend>/<threeend>') # Define the route -- requires 3 inputs
 def get_tls(sequence, fiveend, threeend):
-    tls = three_letter_seq(sequence, fiveend, threeend)
+    tls = three_letter_seq(sequence, fiveend, threeend) # Actually make the thing
     return tls
 
 # Allow for automatic updates
-@app.flask_app.route('/gitupdate', methods=['POST'])
+@app.flask_app.route('/gitupdate', methods=['POST']) # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
     from flask import request
-    json = request.get_json()
-    if json.get('ref') == 'refs/heads/%s' % branch:
-        print('%s: push to %s received!' % (name, branch))
+    json = request.get_json() # Get the actual data from GitHub
+    if json.get('ref') == 'refs/heads/master': # CHck that it's right
+        print('Push received, server going DOWN!')
+        sc.runcommand('git pull') # Get new files from GitHub
         sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
-    return 'OK'
+    return 'OK' # Will only be displayed if the command above is NOT run
 
 # Run the server
 if __name__ == "__main__":
