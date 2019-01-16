@@ -91,6 +91,7 @@ def get_tls(sequence, fiveend, threeend):
 # Allow for automatic updates
 @app.route('/gitupdate', methods=['POST']) # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
+    sc.runcommand('echo "Git command received at %s" >> tmp.log' % sc.getdate())
     from flask import request
     json = request.get_json() # Get the actual data from GitHub
     if json.get('ref') == 'refs/heads/master': # CHck that it's right
