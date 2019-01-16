@@ -108,7 +108,7 @@ def get_tls(sequence, fiveend, threeend):
     return tls
 
 # Allow for automatic updates
-@app.flask_app.route('/gitupdate', methods=['POST']) # The URL will be e.g. rna.ocds.co/gitupdate
+@app.route('/gitupdate', methods=['POST']) # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
     from flask import request
     json = request.get_json() # Get the actual data from GitHub
