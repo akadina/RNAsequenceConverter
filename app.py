@@ -99,7 +99,7 @@ def git_update():
         if json is not None and json.get('ref') == 'refs/heads/master': # Check that it's right
             sc.runcommand('echo "Push received at %s, server going DOWN!" >> tmp.log' % sc.getdate(), printinput=True)
             sc.runcommand('git pull', printinput=True, printoutput=True) # Get new files from GitHub
-            #sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
+            sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
     except Exception as E:
         import traceback
         output = 'Exception encountered: %s<br>%s' % (str(E), traceback.format_exc())
