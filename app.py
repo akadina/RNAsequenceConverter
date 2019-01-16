@@ -102,4 +102,4 @@ def git_update():
 
 # Run the server
 if __name__ == "__main__":
-    app.run()
+    app.run(with_twisted=False)
