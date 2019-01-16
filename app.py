@@ -6,15 +6,22 @@ import scirisweb as sw
 #####################
 
 def three_letter_seq(sequence, thio_end5, thio_end3):
+    seq = sequence.upper()
+    new_seq = ''
+    for i in range(len(seq)):
+        if seq[i] not in 'ACGTU':
+            return('Sequence not valid')
+        if seq[i] == 'T': new_seq += 'U'
+        else: new_seq += seq[i]
+
     s = ''
     thio_end5 = int(thio_end5)
     thio_end3 = int(thio_end3)
     if thio_end3 < 0: return ''
-    for i in range(len(sequence)):
-        if i == len(sequence) - 1: s = s + '-' + sequence[i] + ('r' if thio_end3 == 0 else 'm')
-        elif i < thio_end5: s = s + '-' + sequence[i] + 'ms'
-        elif i > (len(sequence) - thio_end3 - 1): s = s + '-' + sequence[i] + 'ms'
-        else: s = s + '-' + sequence[i] + 'ro'
+    for i in range(len(new_seq)):
+        if i == len(new_seq) - 1: s = s + '-' + new_seq[i] + ('r' if thio_end3 == 0 else 'm')
+        elif i < thio_end5 or i > (len(new_seq) - thio_end3 - 1): s = s + '-' + new_seq[i] + 'ms'
+        else: s = s + '-' + new_seq[i] + 'ro'
     return s
 
 def single_insertion(tls, pos1, pos2, base, twoprime='r', thio=False):
@@ -66,32 +73,6 @@ def single_replacement(tls, pos, base, twoprime='r', thio=False):
     else: mod = '-' + base + two_prime_abbs[twoprime] + ('o' if thio == False else 's')
     modified_tls = tls[:((pos) * 4)] + mod + tls[(pos + 1) * 4:]
     return modified_tls
-
-
-def read_sequence(s):
-    #read sequence. Ensure no errors (AGCU) If any T's - convert to U's
-    sequence = s.upper()
-    seq = ''
-    flag = 1
-    for i in range(len(sequence)):
-        if sequence[i] not in 'ACGTU':
-            flag = 0
-            break
-        if sequence[i] == 'T': seq += 'U'
-        else: seq += sequence[i]
-    
-    if flag != 0:
-        print(seq)
-        print("Sequence length: " + str(len(seq)))
-    else: print('Sequence not valid')
-    return sequence
-
-
-def make_sequence(seq, thio_end5, thio_end3):
-    tls = three_letter_seq(seq, thio_end5, thio_end3)
-    print('Standard three letter sequence is: ')
-    print(tls)
-    return tls
 
 
 #####################
