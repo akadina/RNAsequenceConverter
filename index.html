@@ -82,8 +82,7 @@
           <p>{{ tls_replacement }}</p> -->
           
     </div>
-     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina {{ bookk }} | Powered by <a href="http://sciris.org">Sciris</a></i></p>
-     <p><button v-on:click="get_version">JEEZ</button></p> 
+     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
   </div>
 </div>
 </body>
@@ -105,40 +104,21 @@
         thiophosph: '',
         thiophosphoryl: '',
         version: 'Not loaded',
-        bookk: 'AAA'
       }
     },
 
-    
-
-    // computed: {
-    //   version: function () {
-    //     return this.get_version()
-    //   },
-    // },
+    created () {
+      var url = '/api/get_version';
+      axios.post(url)
+              .then(function (response) {
+                vm.version = response.data
+              })
+    },
     
     methods: {
 
-      get_version: async function () {
-          console.log('get_version() called');
-          console.log(this.version)
-          console.log(this.bookk)
-          var url = '/api/get_version';
-          axios.post(url)
-                  .then(function (response) {
-                    this.version = response.data
-                    this.bookk = 'HMMM'
-                    vm.version = response.data
-                    vm.bookk = '??DFKJDFKDJ'
-                    console.log(this.version)
-                    console.log(this.bookk)
-                    return response.data
-                  })
-                },
-
       get_tls: function () {
         console.log('get_tls() called');
-        console.log(vm.tls)
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
@@ -150,9 +130,6 @@
       },
     },
 
-    mounted () {
-      this.get_version()
-    },
   })
 </script>
 
