@@ -107,6 +107,16 @@ def get_tls(sequence, fiveend, threeend):
     tls = three_letter_seq(sequence, fiveend, threeend)
     return tls
 
+# Allow for automatic updates
+@app.flask_app.route('/gitupdate', methods=['POST'])
+def git_update():
+    from flask import request
+    json = request.get_json()
+    if json.get('ref') == 'refs/heads/%s' % branch:
+        print('%s: push to %s received!' % (name, branch))
+        sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
+    return 'OK'
+
 # Run the server
 if __name__ == "__main__":
     app.run()
