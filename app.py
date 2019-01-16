@@ -6,6 +6,8 @@ import scirisweb as sw
 #%% Code part
 #####################
 
+__version__ = '0.1.3' # Specify a version
+
 def three_letter_seq(sequence, thio_end5, thio_end3):
     seq = sequence.upper()
     new_seq = ''
@@ -83,11 +85,17 @@ def single_replacement(tls, pos, base, twoprime='r', thio=False):
 # Create the app
 app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Set to a nonstandard port to avoid collisions
 
-# Define the API
+# Define the API for the tool
 @app.route('/get_tls/<sequence>/<fiveend>/<threeend>') # Define the route -- requires 3 inputs
 def get_tls(sequence, fiveend, threeend):
     tls = three_letter_seq(sequence, fiveend, threeend) # Actually make the thing
     return tls
+
+# Get the version
+@app.route('/get_version')
+def get_version():
+    print(__version__)
+    return __version__
 
 # Allow for automatic updates from GitHub
 @app.route('/gitupdate') # The URL will be e.g. rna.ocds.co/gitupdate
