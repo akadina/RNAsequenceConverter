@@ -1,1 +1,1 @@
-nohup python3.7 app.py > tmp.out &
+nohup python3.7 app.py & # Run the app remotely so you can log out and it keeps running (for Linux only)
