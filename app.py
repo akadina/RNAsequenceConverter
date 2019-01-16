@@ -1,4 +1,5 @@
 # Imports
+import sciris as sc
 import scirisweb as sw
 
 #####################
@@ -88,22 +89,21 @@ def get_tls(sequence, fiveend, threeend):
     tls = three_letter_seq(sequence, fiveend, threeend) # Actually make the thing
     return tls
 
-@app.route('/test')
-def test():
-    print('Test worked!')
-    return 'Test worked :)'
-
 # Allow for automatic updates
 @app.route('/gitupdate', methods=['POST', 'GET']) # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
-    # sc.runcommand('echo "Git command received at %s" >> tmp.log' % sc.getdate(), printinput=True)
-    # from flask import request
-    # json = request.get_json() # Get the actual data from GitHub
-    # if json.get('ref') == 'refs/heads/master': # CHck that it's right
-    #     sc.runcommand('echo "Push received at %s, server going DOWN!" >> tmp.log' % sc.getdate(), printinput=True)
-    #     sc.runcommand('git pull', printinput=True, printoutput=True) # Get new files from GitHub
-    #     print(output)
-        #sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
+    try:
+        sc.runcommand('echo "Git command received at %s" >> tmp.log' % sc.getdate(), printinput=True)
+        from flask import request
+        json = request.get_json() # Get the actual data from GitHub
+        if json is not None and json.get('ref') == 'refs/heads/master': # Check that it's right
+            sc.runcommand('echo "Push received at %s, server going DOWN!" >> tmp.log' % sc.getdate(), printinput=True)
+            sc.runcommand('git pull', printinput=True, printoutput=True) # Get new files from GitHub
+            sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
+    except Exception as E:
+        import traceback
+        output = 'Exception encountered: %s<br>%s' % (str(E), traceback.format_exc())
+        return output
     return 'OK' # Will only be displayed if the command above is NOT run
 
 # Run the server
