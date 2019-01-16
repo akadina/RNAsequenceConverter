@@ -94,7 +94,7 @@ def test():
     return 'Test worked :)'
 
 # Allow for automatic updates
-@app.route('/gitupdate', methods=['POST']) # The URL will be e.g. rna.ocds.co/gitupdate
+@app.route('/gitupdate', methods=['POST', 'GET']) # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
     sc.runcommand('echo "Git command received at %s" >> tmp.log' % sc.getdate(), printinput=True)
     from flask import request
