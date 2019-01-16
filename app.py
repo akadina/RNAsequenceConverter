@@ -94,7 +94,7 @@ def git_update():
     from flask import request
     json = request.get_json() # Get the actual data from GitHub
     if json.get('ref') == 'refs/heads/master': # CHck that it's right
-        print('Push received, server going DOWN!')
+        sc.runcommand('echo "Push received at %s, server going DOWN!" >> tmp.log' % sc.getdate())
         sc.runcommand('git pull') # Get new files from GitHub
         sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
     return 'OK' # Will only be displayed if the command above is NOT run
