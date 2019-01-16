@@ -36,27 +36,51 @@
     <h1>RNA sequence converter</h1>
     <div class="controls">
       <h2>Disclaimer</h2>
-      <p>This code is only meant to make life easier</p>
-      <p>Use it at your own risk. After running this, you may choose to compare the result to your manual conversion as this is severely undertested</p>
+          <p>This code is only meant to make Nastia's and Walker's lifes easier</p>
+          <p>Use it at your own risk. After running this, you may choose to compare the result to your manual conversion as this is severely undertested</p>
 
       <h2>Convert sequence</h2>
-      <p>Convert an RNA sequence into a sequence that you can directly feed to the machine.</p>
-      <p>Note: only ACGTU are accepted. All T's will be converted to U</p>
-      <p>Enter a sequence below</p>
+          <p>Convert an RNA sequence into a sequence that you can directly feed to the machine.</p>
+          <p>Note: only ACGTU are accepted. All T's will be converted to U</p>
+          <p>Enter a sequence below</p>
 
-      <input v-model="sequence" placeholder="Enter sequence">
+          <input v-model="sequence" placeholder="Enter sequence">
 
       <h2>Ends</h2>
-      <p>Synthego standard RNA mods include 3 phosphate bridges at the 5'- and 3'-ends being thiophosphorylated</p>
-      <p>Currently we do not handle base modifications</p>
+          <p>Synthego standard RNA mods include 3 phosphate bridges at the 5'- and 3'-ends being thiophosphorylated</p>
+          <p>Currently we do not handle base modifications</p>
 
-      <p>Thiophosphates & OMe at the 5'-end: <input v-model="fiveend" placeholder="0"></p>
-      <p>Thiophosphates & OMe at the 3'-end: <input v-model="threeend" placeholder="0"></p>
+          <p>Thiophosphates & OMe at the 5'-end: <input v-model="fiveend" placeholder="0"></p>
+          <p>Thiophosphates & OMe at the 3'-end: <input v-model="threeend" placeholder="0"></p>
 
       <h2>Copy your TLS</h2>
-      <p><button v-on:click="get_tls">Get my TLS</button></p>
-      <p>Standard three letter sequence is:</p>
-      <p>{{ tls }}</p>
+          <p><button v-on:click="get_tls">Get my TLS</button></p>
+          <p>Standard three letter sequence is:</p>
+          <p>{{ tls }}</p>
+     
+     
+      <h2>Additional modifications: replacements</h2>
+
+          <p>Replace at: <input v-model="replacement_pos" placeholder="position"></p>
+        
+          <p>With nucleotide: <select v-model="replacement_base">
+              <option disabled value="">Please select one</option>
+              <option>A</option>
+              <option>C</option>
+              <option>G</option>
+              <option>U</option>
+              <option>X</option>
+          </select></p>
+        
+           <p>Thiophosphorylated: <input type="checkbox" id="thiophosphoryl" v-model="thiophosphoryl">
+           <label for="checkbox">{{ thiophosph }}</label></p>
+        
+      <h2>Copy TLS with replacement</h2>
+            
+            <!--
+          <p><button v-on:click="get_tls_replacement">Get TLS with replacement</button></p> 
+          <p>{{ tls_replacement }}</p> -->
+          
 
     </div>
   </div>
@@ -73,10 +97,11 @@
         sequence: '',
         fiveend: 0,
         threeend: 0,
-        tls: 'No TLS'
+        tls: 'No TLS',
+        tls_replacement: 'No TLS'
       }
     },
-
+    
     methods: {
       get_tls: function () {
         var url = '/api/get_tls';
