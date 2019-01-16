@@ -90,7 +90,7 @@ def get_tls(sequence, fiveend, threeend):
     return tls
 
 # Allow for automatic updates
-@app.route('/gitupdate', methods=['POST', 'GET']) # The URL will be e.g. rna.ocds.co/gitupdate
+@app.route('/gitupdate') # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
     try:
         sc.runcommand('echo "Git command received at %s" >> tmp.log' % sc.getdate(), printinput=True)
