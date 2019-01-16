@@ -82,7 +82,7 @@
           <p>{{ tls_replacement }}</p> -->
           
     </div>
-     <p style="font-size: 0.6em"><i>Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
+     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
   </div>
 </div>
 </body>
@@ -98,12 +98,27 @@
         fiveend: 0,
         threeend: 0,
         tls: 'No TLS',
-        tls_replacement: 'No TLS'
+        tls_replacement: 'No TLS',
+        replacement_pos: '',
+        replacement_base: '',
+        thiophosph: '',
+        thiophosphoryl: '',
+        version: 'Not loaded',
       }
+    },
+
+    created () {
+      var url = '/api/get_version';
+      axios.post(url)
+              .then(function (response) {
+                vm.version = response.data
+              })
     },
     
     methods: {
+
       get_tls: function () {
+        console.log('get_tls() called');
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
@@ -113,7 +128,8 @@
                   vm.tls = response.data
                 })
       },
-    }
+    },
+
   })
 </script>
 
