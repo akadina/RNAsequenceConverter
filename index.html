@@ -9,7 +9,7 @@
   <link href='https://fonts.googleapis.com/css?family=Avenir' rel='stylesheet'>
   <style>
     body {
-      font-family: Avenir,Arial;
+      font-family: 'Avenir';
       font-size: 0.8em;
     }
 
@@ -50,8 +50,8 @@
           <p>Synthego standard RNA mods include 3 phosphate bridges at the 5'- and 3'-ends being thiophosphorylated</p>
           <p>Currently we do not handle base modifications</p>
 
-          <p>Thiophosphates & OMe at the 5'-end: <input v-model="fiveend" placeholder="0"></p>
-          <p>Thiophosphates & OMe at the 3'-end: <input v-model="threeend" placeholder="0"></p>
+          <p>Thiophosphates & OMe at the 5'-end: <input v-model="fiveend" placeholder="3"></p>
+          <p>Thiophosphates & OMe at the 3'-end: <input v-model="threeend" placeholder="3"></p>
 
       <h2>Copy your TLS</h2>
           <p><button v-on:click="get_tls">Get my TLS</button></p>
@@ -61,7 +61,7 @@
      
       <h2>Additional modifications: replacements</h2>
 
-          <p>Replace at: <input v-model="replacement_pos" placeholder="position"></p>
+          <p>Replace at: <input v-model="replacement_pos" placeholder="0"></p>
         
           <p>With nucleotide: <select v-model="replacement_base">
               <option disabled value="">Please select one</option>
@@ -71,18 +71,28 @@
               <option>U</option>
               <option>X</option>
           </select></p>
-        
+
+          <p>
+            <input type="radio" name = "twoprime" id="vanilla" value="vanilla" v-model="twoprime">
+              <label for="vanilla">Vanilla</label>
+              <br>
+            <input type="radio" name = "twoprime" id="methyl" value="methyl" v-model="twoprime">
+              <label for="methyl">2'-OMe</label>
+              <br>
+            <input type="radio" name = "twoprime" id="fluoro" value="fluoro" v-model="twoprime">
+              <label for="fluoro">2'-Fluoro</label>
+              <br>
+           </p>
+
            <p>Thiophosphorylated: <input type="checkbox" id="thiophosphoryl" v-model="thiophosphoryl">
-           <label for="checkbox">{{ thiophosph }}</label></p>
+           <!-- <label for="checkbox">{{ thiophosph }}</label></p> -->
         
-      <h2>Copy TLS with replacement</h2>
-            
-            <!--
-          <p><button v-on:click="get_tls_replacement">Get TLS with replacement</button></p> 
-          <p>{{ tls_replacement }}</p> -->
+           <p><button v-on:click="get_repl_tls">Get my TLS</button></p>
+           <p>Sequence with replacement is:</p>
+           <p>{{ tls_replacement }}</p>
           
+
     </div>
-     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
   </div>
 </div>
 </body>
@@ -95,30 +105,16 @@
     data() {
       return {
         sequence: '',
-        fiveend: 0,
-        threeend: 0,
+        fiveend: 3,
+        threeend: 3,
         tls: 'No TLS',
-        tls_replacement: 'No TLS',
-        replacement_pos: '',
-        replacement_base: '',
-        thiophosph: '',
-        thiophosphoryl: '',
-        version: 'Not loaded',
+        thiophosphoryl: false,
+        tls_replacement: 'Hello world'
       }
-    },
-
-    created () {
-      var url = '/api/get_version';
-      axios.post(url)
-              .then(function (response) {
-                vm.version = response.data
-              })
     },
     
     methods: {
-
       get_tls: function () {
-        console.log('get_tls() called');
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
@@ -128,8 +124,20 @@
                   vm.tls = response.data
                 })
       },
-    },
-
+      
+      get_repl_tls: function () {
+        var url = '/api/get_repl_tls';
+        url += '/' + vm.tls;
+        url += '/' + vm.replacement_pos;
+        url += '/' + vm.replacement_base;
+        url += '/' + vm.twoprime;
+        url += '/' + vm.thiophosphoryl;
+        axios.post(url) // Use a POST request to pass along the value -- this will be simplified in future!
+                .then(function (response) {
+                  vm.tls_replacement = response.data
+                })
+      },
+    }
   })
 </script>
 

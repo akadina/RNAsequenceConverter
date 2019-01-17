@@ -1,14 +1,12 @@
 # Imports
-import sciris as sc
 import scirisweb as sw
 
 #####################
 #%% Code part
 #####################
 
-__version__ = '0.1.3' # Specify a version
-
 def three_letter_seq(sequence, thio_end5, thio_end3):
+
     seq = sequence.upper()
     new_seq = ''
     for i in range(len(seq)):
@@ -26,8 +24,8 @@ def three_letter_seq(sequence, thio_end5, thio_end3):
         elif i < thio_end5 or i > (len(new_seq) - thio_end3 - 1): s = s + '-' + new_seq[i] + 'ms'
         else: s = s + '-' + new_seq[i] + 'ro'
     return s
-
-def single_insertion(tls, pos1, pos2, base, twoprime='r', thio=False):
+    
+'''def single_insertion(tls, pos1, pos2, base, twoprime='r', thio):
     #just in case user swapped pos1 and pos2
     if pos2 < pos1: pos1, pos2 = pos2, pos1
     # because Python is zero-based and humans are one-based
@@ -52,29 +50,28 @@ def single_insertion(tls, pos1, pos2, base, twoprime='r', thio=False):
     if pos1 == len(tls) / 4: mod = '-' + base + two_prime_abbs[twoprime]
     else: mod = '-' + base + two_prime_abbs[twoprime] + ('o' if thio == False else 's')
     modified_tls = tls[:((pos1 + 1) * 4)] + mod + tls[(pos1 + 1) * 4:]
-    return modified_tls
+    return modified_tls'''
 
-def single_replacement(tls, pos, base, twoprime='r', thio=False):
-
+def single_replacement(tls, pos, base, twoprime, thio):
+    
     # because Python is zero-based and humans are one-based
-    pos -= 1
+    pos = int(pos) - 1
+    true_or_false = {'true': True, 'false': False}
+    if base == 'X': twoprime = 'x'
     
     if pos < 0 or pos > len(tls) / 4:
-        print('No replacement has been made.')
-        print('Cannot replace base that does not exist.')
-        return(tls)
+        return('Cannot make this replacement')
     
     elif base not in 'ACGUX':
-        print('No replacement has been made.')
-        print('Base not valid')
-        return(tls)
-    
-    two_prime_abbs = {'OH': 'r', 'Methyl': 'm', 'Fluoro': 'f'}
+        return('No replacement has been made. Base not valid')
+
+    two_prime_abbs = {'vanilla': 'r', 'methyl': 'm', 'fluoro': 'f', 'x': 'x'}
     
     if pos == len(tls) / 4: mod = '-' + base + two_prime_abbs[twoprime]
         
-    else: mod = '-' + base + two_prime_abbs[twoprime] + ('o' if thio == False else 's')
+    else: mod = '-' + base + two_prime_abbs[twoprime] + ('s' if true_or_false[thio] else 'o')
     modified_tls = tls[:((pos) * 4)] + mod + tls[(pos + 1) * 4:]
+    
     return modified_tls
 
 
@@ -85,29 +82,17 @@ def single_replacement(tls, pos, base, twoprime='r', thio=False):
 # Create the app
 app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Set to a nonstandard port to avoid collisions
 
-# Define the API for the tool
-@app.route('/get_tls/<sequence>/<fiveend>/<threeend>') # Define the route -- requires 3 inputs
+# Define the API
+@app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
 def get_tls(sequence, fiveend, threeend):
-    tls = three_letter_seq(sequence, fiveend, threeend) # Actually make the thing
+    tls = three_letter_seq(sequence, fiveend, threeend)
     return tls
 
-# Get the version
-@app.route('/get_version')
-def get_version():
-    print(__version__)
-    return __version__
-
-# Allow for automatic updates from GitHub
-@app.route('/gitupdate') # The URL will be e.g. rna.ocds.co/gitupdate
-def git_update():
-    from flask import request
-    json = request.get_json() # Get the actual data from GitHub
-    if json is not None and json.get('ref') == 'refs/heads/master': # Check that it's right
-        sc.runcommand('echo "Push received at %s, server going DOWN!" >> tmp.log' % sc.getdate(), printinput=True)
-        sc.runcommand('git pull', printinput=True, printoutput=True) # Get new files from GitHub
-        sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
-    return 'OK' # Will only be displayed if the command above is NOT run
-
+@app.route('/get_repl_tls/<tls>/<replacement_pos>/<replacement_base>/<twoprime>/<thiophosphoryl>')
+def get_repl_tls(tls, replacement_pos, replacement_base, twoprime, thiophosphoryl):
+    replaced = single_replacement(tls, replacement_pos, replacement_base, twoprime, thiophosphoryl)
+    return replaced
+    
 # Run the server
 if __name__ == "__main__":
     app.run()
