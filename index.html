@@ -104,7 +104,7 @@
 
     data() {
       return {
-        sequence: 'No sequence',
+        sequence: '',
         fiveend: 3,
         threeend: 3,
         tls: 'No TLS',
@@ -129,6 +129,9 @@
 
       get_tls: function () {
         console.log('get_tls() called');
+        if (vm.sequence === '') {
+          vm.sequence = 'Please enter a sequence'
+        }
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
