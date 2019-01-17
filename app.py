@@ -6,7 +6,7 @@ import scirisweb as sw
 #%% Code part
 #####################
 
-__version__ = '0.1.4' # Specify a version
+__version__ = '0.1.5' # Specify a version
 
 def three_letter_seq(sequence, thio_end5, thio_end3):
 
