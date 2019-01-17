@@ -9,7 +9,7 @@
   <link href='https://fonts.googleapis.com/css?family=Avenir' rel='stylesheet'>
   <style>
     body {
-      font-family: 'Avenir';
+      font-family: Avenir,Arial;
       font-size: 0.8em;
     }
 
@@ -91,8 +91,8 @@
            <p>Sequence with replacement is:</p>
            <p>{{ tls_replacement }}</p>
           
-
     </div>
+     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
   </div>
 </div>
 </body>
@@ -116,9 +116,19 @@
         version: 'Not loaded',
       }
     },
+
+    created () {
+      var url = '/api/get_version';
+      axios.post(url)
+              .then(function (response) {
+                vm.version = response.data
+              })
+    },
     
     methods: {
+
       get_tls: function () {
+        console.log('get_tls() called');
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
