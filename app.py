@@ -88,23 +88,26 @@ app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Se
 # Define the API for the tool
 @app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
 def get_tls(sequence, fiveend, threeend):
+    print('get_tls() called')
     tls = three_letter_seq(sequence, fiveend, threeend)
     return tls
 
 @app.route('/get_repl_tls/<tls>/<replacement_pos>/<replacement_base>/<twoprime>/<thiophosphoryl>')
 def get_repl_tls(tls, replacement_pos, replacement_base, twoprime, thiophosphoryl):
+    print('get_repl_tls() called')
     replaced = single_replacement(tls, replacement_pos, replacement_base, twoprime, thiophosphoryl)
     return replaced
 
 # Get the version
 @app.route('/get_version')
 def get_version():
-    print(__version__)
+    print('get_version() called')
     return __version__
 
 # Allow for automatic updates from GitHub
 @app.route('/gitupdate') # The URL will be e.g. rna.ocds.co/gitupdate
 def git_update():
+    print('git_update() called')
     from flask import request
     json = request.get_json() # Get the actual data from GitHub
     if json is not None and json.get('ref') == 'refs/heads/master': # Check that it's right
