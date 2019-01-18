@@ -6,10 +6,10 @@
   <title>RNA Sequence Converter</title>
   <script src="https://unpkg.com/vue"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css?family=Avenir' rel='stylesheet'>
   <style>
     body {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Avenir';
       font-size: 0.8em;
     }
 
@@ -35,32 +35,29 @@
   <div>
     <h1>RNA sequence converter</h1>
     <div class="controls">
-      <h2>Disclaimer</h2>
-          <p>This code is only meant to make Nastia's and Walker's lifes easier</p>
-          <p>Use it at your own risk. After running this, you may choose to compare the result to your manual conversion as this is severely undertested</p>
+      <h2>Use it at your own risk.</h2>
+          <p>Email/slack/send a carrier pigeon to anastasia.kadina@synthego.com if you find any problems.</p>
 
-      <h2>Convert sequence</h2>
-          <p>Convert an RNA sequence into a sequence that you can directly feed to the machine.</p>
-          <p>Note: only ACGTU are accepted. All T's will be converted to U</p>
-          <p>Enter a sequence below</p>
+      <h2>Convert an RNA sequence into a three letter sequence.</h2>
+          <p>Enter a sequence below. Note: only ACGTU are accepted. All T's will be converted to U</p>
 
-          <input v-model="sequence" placeholder="Enter sequence">
+          <input v-model="sequence" placeholder="RNA sequence">
 
-      <h2>Ends</h2>
-          <p>Synthego standard RNA mods include 3 phosphate bridges at the 5'- and 3'-ends being thiophosphorylated</p>
-          <p>Currently we do not handle base modifications</p>
+          <p>Standard RNA mods include 3 nucleotides at the 5'- and 3'-ends being thiophosphorylated and methylated.</p>
+          <p>Currently we do not handle base modifications.</p>
 
-          <p>Thiophosphates & OMe at the 5'-end: <input v-model="fiveend" placeholder="3"></p>
-          <p>Thiophosphates & OMe at the 3'-end: <input v-model="threeend" placeholder="3"></p>
+          <p>Mods at the 5'-end: <input v-model="fiveend" placeholder="3">
+          &nbsp&nbsp&nbsp&nbsp 3'-end: <input v-model="threeend" placeholder="3"></p>
 
-      <h2>Copy your TLS</h2>
-          <p><button v-on:click="get_tls">Get my TLS</button></p>
+          <p><button v-on:click="get_tls(); get_sequence_length();">Get my TLS</button></p>
           <p>Standard three letter sequence is:</p>
-          <p style="color: #04f; font-weight: bold">{{ tls }}</p>
+          <p>{{ tls }}</p>
+          <p>{{ sequence_length }}</p>
      
      
       <h2>Additional modifications: replacements</h2>
-
+      
+          <p>Currently only single modifications are enabled</p>
           <p>Replace at: <input v-model="replacement_pos" placeholder="0"></p>
         
           <p>With nucleotide: <select v-model="replacement_base">
@@ -85,14 +82,13 @@
            </p>
 
            <p>Thiophosphorylated: <input type="checkbox" id="thiophosphoryl" v-model="thiophosphoryl">
-           <!-- <label for="checkbox">{{ thiophosph }}</label></p> -->
         
            <p><button v-on:click="get_repl_tls">Get my TLS</button></p>
            <p>Sequence with replacement is:</p>
-           <p style="color: #04f; font-weight: bold">{{ tls_replacement }}</p>
+           <p>{{ tls_replacement }}</p>
           
+
     </div>
-     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
   </div>
 </div>
 </body>
@@ -105,40 +101,34 @@
     data() {
       return {
         sequence: '',
+        sequence_length: '',
         fiveend: 3,
         threeend: 3,
         tls: 'No TLS',
-        tls_replacement: 'No TLS',
-        replacement_pos: '',
-        replacement_base: '',
-        thiophosph: '',
+        twoprime: "vanilla",
         thiophosphoryl: false,
-        version: 'Not loaded',
+        tls_replacement: ''
       }
-    },
-
-    created () {
-      var url = '/api/get_version';
-      axios.post(url)
-              .then(function (response) {
-                vm.version = response.data
-              })
     },
     
     methods: {
-
       get_tls: function () {
-        console.log('get_tls() called');
-        if (vm.sequence === '') {
-          vm.sequence = 'Please enter a sequence'
-        }
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
         url += '/' + vm.threeend;
-        axios.post(url) // Use a POST request to pass along the value -- this will be simplified in future!
+        axios.post(url)
                 .then(function (response) {
                   vm.tls = response.data
+                })
+      },
+      
+      get_sequence_length: function () {
+        var url = '/api/get_sequence_length';
+        url += '/' + vm.sequence;
+        axios.post(url)
+                .then(function (response) {
+                  vm.sequence_length = response.data
                 })
       },
       
@@ -149,7 +139,7 @@
         url += '/' + vm.replacement_base;
         url += '/' + vm.twoprime;
         url += '/' + vm.thiophosphoryl;
-        axios.post(url) // Use a POST request to pass along the value -- this will be simplified in future!
+        axios.post(url)
                 .then(function (response) {
                   vm.tls_replacement = response.data
                 })
