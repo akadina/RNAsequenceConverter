@@ -55,12 +55,12 @@
           <p>{{ sequence_length }}</p>
      
      
-      <h2>Additional modifications: replacements</h2>
+      <h2>Additional modifications: replacement</h2>
       
-          <p>Currently only single modifications are enabled</p>
-          <p>Replace at: <input v-model="replacement_pos" placeholder="0"></p>
-        
-          <p>With nucleotide: <select v-model="replacement_base">
+          <p>Currently only single replacement is enabled</p>
+          <p>Replace at: <input v-model="replacement_pos" placeholder="0">
+          
+          &nbsp&nbsp&nbsp&nbspWith nucleotide: <select v-model="replacement_base">
               <option disabled value="">Please select one</option>
               <option>A</option>
               <option>C</option>
@@ -70,23 +70,61 @@
           </select></p>
 
           <p>
-            <input type="radio" name = "twoprime" id="vanilla" value="vanilla" v-model="twoprime">
-              <label for="vanilla">Vanilla</label>
+            <input type="radio" name = "r_twoprime" id="r_vanilla" value="r_vanilla" v-model="r_twoprime">
+              <label for="r_vanilla">Vanilla</label>
               <br>
-            <input type="radio" name = "twoprime" id="methyl" value="methyl" v-model="twoprime">
-              <label for="methyl">2'-OMe</label>
+            <input type="radio" name = "r_twoprime" id="r_methyl" value="r_methyl" v-model="r_twoprime">
+              <label for="r_methyl">2'-OMe</label>
               <br>
-            <input type="radio" name = "twoprime" id="fluoro" value="fluoro" v-model="twoprime">
-              <label for="fluoro">2'-Fluoro</label>
+            <input type="radio" name = "r_twoprime" id="r_fluoro" value="r_fluoro" v-model="r_twoprime">
+              <label for="r_fluoro">2'-Fluoro</label>
               <br>
            </p>
 
-           <p>Thiophosphorylated: <input type="checkbox" id="thiophosphoryl" v-model="thiophosphoryl">
+           <p>Thiophosphorylated: <input type="checkbox" id="r_thiophosphoryl" v-model="r_thiophosphoryl">
         
-           <p><button v-on:click="get_repl_tls">Get my TLS</button></p>
+           <p><button v-on:click="get_repl_tls();">Get my TLS</button>
+           &nbsp&nbsp&nbsp&nbsp
+           <button v-on:click="get_replacement_length();">Check length</button><p>
+           
            <p>Sequence with replacement is:</p>
            <p>{{ tls_replacement }}</p>
-          
+           <p>{{ tls_replacement_length }}</p>
+           
+      <h2>Additional modifications: insertion</h2>
+      
+          <p>Currently only single insertion is enabled</p>
+          <p>Insert between <input v-model="pos1" placeholder="0">&nbsp&nbspand <input v-model="pos2" placeholder="0">
+        
+          &nbsp&nbspNucleotide: <select v-model="insertion_base">
+              <option disabled value="">Please select one</option>
+              <option>A</option>
+              <option>C</option>
+              <option>G</option>
+              <option>U</option>
+              <option>X</option>
+          </select></p>
+
+          <p>
+            <input type="radio" name = "i_twoprime" id="i_vanilla" value="i_vanilla" v-model="i_twoprime">
+              <label for="i_vanilla">Vanilla</label>
+              <br>
+            <input type="radio" name = "i_twoprime" id="i_methyl" value="i_methyl" v-model="i_twoprime">
+              <label for="i_methyl">2'-OMe</label>
+              <br>
+            <input type="radio" name = "i_twoprime" id="i_fluoro" value="i_fluoro" v-model="i_twoprime">
+              <label for="i_fluoro">2'-Fluoro</label>
+              <br>
+           </p>
+
+           <p>Thiophosphorylated: <input type="checkbox" id="i_thiophosphoryl" v-model="i_thiophosphoryl">
+        
+           <p><button v-on:click="get_insertion_tls();">Get my TLS</button>
+           &nbsp&nbsp&nbsp&nbsp
+           <button v-on:click="get_insertion_length();">Check length</button></p>
+           <p>Sequence with insertion is:</p>
+           <p>{{ tls_insertion }}</p>
+           <p>{{ tls_insertion_length }}</p>
 
     </div>
   </div>
@@ -105,9 +143,14 @@
         fiveend: 3,
         threeend: 3,
         tls: 'No TLS',
-        twoprime: "vanilla",
-        thiophosphoryl: false,
-        tls_replacement: ''
+        r_twoprime: 'r_vanilla',
+        r_thiophosphoryl: false,
+        tls_replacement: '',
+        tls_replacement_length: '',
+        i_twoprime: 'i_vanilla',
+        i_thiophosphoryl: false,
+        tls_insertion: '',
+        tls_insertion_length: ''
       }
     },
     
@@ -137,11 +180,43 @@
         url += '/' + vm.tls;
         url += '/' + vm.replacement_pos;
         url += '/' + vm.replacement_base;
-        url += '/' + vm.twoprime;
-        url += '/' + vm.thiophosphoryl;
+        url += '/' + vm.r_twoprime;
+        url += '/' + vm.r_thiophosphoryl;
         axios.post(url)
                 .then(function (response) {
                   vm.tls_replacement = response.data
+                })
+      },
+      
+      get_replacement_length: function () {
+        var url = '/api/get_replacement_length';
+        url += '/' + vm.tls_replacement;
+        axios.post(url)
+                .then(function (response) {
+                  vm.tls_replacement_length = response.data
+                })
+      },
+      
+      get_insertion_tls: function () {
+        var url = '/api/get_insertion_tls';
+        url += '/' + vm.tls;
+        url += '/' + vm.pos1;
+        url += '/' + vm.pos2;
+        url += '/' + vm.insertion_base;
+        url += '/' + vm.i_twoprime;
+        url += '/' + vm.i_thiophosphoryl;
+        axios.post(url)
+                .then(function (response) {
+                  vm.tls_insertion = response.data
+                })
+      },
+      
+      get_insertion_length: function () {
+        var url = '/api/get_insertion_length';
+        url += '/' + vm.tls_insertion;
+        axios.post(url)
+                .then(function (response) {
+                  vm.tls_insertion_length = response.data
                 })
       },
     }
