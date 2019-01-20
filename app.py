@@ -1,9 +1,12 @@
 # Imports
+import sciris as sc
 import scirisweb as sw
 
 #####################
 #%% Code part
 #####################
+
+__version__ = '0.1.5' # Specify a version
 
 def three_letter_seq(sequence, thio_end5, thio_end3):
 
@@ -104,19 +107,22 @@ def single_insertion(tls, pos1, pos2, base, twoprime, thio):
 # Create the app
 app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Set to a nonstandard port to avoid collisions
 
-# Define the API
+# Define the API for the tool
 @app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
 def get_tls(sequence, fiveend, threeend):
+    print('get_tls() called')
     tls = three_letter_seq(sequence, fiveend, threeend)
     return tls
     
 @app.route('/get_sequence_length/<sequence>')
 def get_sequence_length(sequence):
+    print('get_sequence_length() called')
     length = sequence_length(sequence)
     return length
 
 @app.route('/get_repl_tls/<tls>/<replacement_pos>/<replacement_base>/<r_twoprime>/<r_thiophosphoryl>')
 def get_repl_tls(tls, replacement_pos, replacement_base, r_twoprime, r_thiophosphoryl):
+    print('get_repl_tls() called')
     replaced = single_replacement(tls, replacement_pos, replacement_base, r_twoprime, r_thiophosphoryl)
     return replaced
 
@@ -127,6 +133,7 @@ def get_replacement_length(tls_replacement):
     
 @app.route('/get_insertion_tls/<tls>/<pos1>/<pos2>/<insertion_base>/<i_twoprime>/<i_thiophosphoryl>')
 def get_insertion_tls(tls, pos1, pos2, insertion_base, i_twoprime, i_thiophosphoryl):
+    print('get_insertion_tls() called')
     inserted = single_insertion(tls, pos1, pos2, insertion_base, i_twoprime, i_thiophosphoryl)
     return inserted
     
@@ -135,6 +142,25 @@ def get_insertion_length(tls_insertion):
     seq = isolate_sequence(tls_insertion)
     return sequence_x_length(seq)
     
+
+# Get the version
+@app.route('/get_version')
+def get_version():
+    print('get_version() called')
+    return __version__
+
+# Allow for automatic updates from GitHub
+@app.route('/gitupdate') # The URL will be e.g. rna.ocds.co/gitupdate
+def git_update():
+    print('git_update() called')
+    from flask import request
+    json = request.get_json() # Get the actual data from GitHub
+    if json is not None and json.get('ref') == 'refs/heads/master': # Check that it's right
+        sc.runcommand('echo "Push received at %s, server going DOWN!" >> tmp.log' % sc.getdate(), printinput=True)
+        sc.runcommand('git pull', printinput=True, printoutput=True) # Get new files from GitHub
+        sc.runcommand('./restart_server') # Nothing after this will run because this kills the server, lol
+    return 'OK' # Will only be displayed if the command above is NOT run
+
 # Run the server
 if __name__ == "__main__":
     app.run()

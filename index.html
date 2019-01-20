@@ -6,10 +6,10 @@
   <title>RNA Sequence Converter</title>
   <script src="https://unpkg.com/vue"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <link href='https://fonts.googleapis.com/css?family=Avenir' rel='stylesheet'>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <style>
     body {
-      font-family: 'Avenir';
+      font-family: 'Montserrat', sans-serif;
       font-size: 0.8em;
     }
 
@@ -127,6 +127,7 @@
            <p>{{ tls_insertion_length }}</p>
 
     </div>
+     <p style="font-size: 0.6em"><i>Version {{ version }} | Developed by Anastasia Kadina | Powered by <a href="http://sciris.org">Sciris</a></i></p>
   </div>
 </div>
 </body>
@@ -153,14 +154,26 @@
         tls_insertion_length: ''
       }
     },
+
+    created () {
+      var url = '/api/get_version';
+      axios.post(url)
+              .then(function (response) {
+                vm.version = response.data
+              })
+    },
     
     methods: {
       get_tls: function () {
+        console.log('get_tls() called');
+        if (vm.sequence === '') {
+          vm.sequence = 'Please enter a sequence'
+        }
         var url = '/api/get_tls';
         url += '/' + vm.sequence;
         url += '/' + vm.fiveend;
         url += '/' + vm.threeend;
-        axios.post(url)
+        axios.post(url) // Use a POST request to pass along the value -- this will be simplified in future!
                 .then(function (response) {
                   vm.tls = response.data
                 })
