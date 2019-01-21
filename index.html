@@ -139,6 +139,7 @@
 
     data() {
       return {
+        version: 'Version information unavailable',
         sequence: '',
         sequence_length: '',
         fiveend: 3,
@@ -164,6 +165,7 @@
     },
     
     methods: {
+
       get_tls: function () {
         console.log('get_tls() called');
         if (vm.sequence === '') {
