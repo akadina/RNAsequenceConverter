@@ -178,7 +178,7 @@
         if (vm.sequence === '') {
           vm.sequence = 'Please enter a sequence'
         }
-        sciris.rpc('get_tls', [vm.sequence,vm.fiveend,vm.threeend])
+        sciris.rpc('get_tls', [vm.sequence, vm.fiveend, vm.threeend])
           .then(function (response) {
             vm.tls = response.data
         })
