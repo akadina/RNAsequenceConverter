@@ -150,7 +150,7 @@ def get_version():
     return __version__
 
 # Allow for automatic updates from GitHub
-@app.register_RPC()
+@app.route('/gitupdate') # The URL for the GitHub webhook will be e.g. rna.ocds.co/gitupdate
 def git_update():
     print('git_update() called')
     from flask import request
