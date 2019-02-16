@@ -5,7 +5,7 @@
 <head>
   <title>RNA Sequence Converter</title>
   <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/sciris-js/dist/sciris-js.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <style>
     body {
@@ -157,11 +157,10 @@
     },
 
     created () {
-      var url = '/api/get_version';
-      axios.post(url)
-              .then(function (response) {
-                vm.version = response.data
-              })
+      sciris.rpcs.rpc('get_version')
+        .then(function (response) {
+            vm.version = response.data
+        })
     },
     
     methods: {
@@ -171,65 +170,42 @@
         if (vm.sequence === '') {
           vm.sequence = 'Please enter a sequence'
         }
-        var url = '/api/get_tls';
-        url += '/' + vm.sequence;
-        url += '/' + vm.fiveend;
-        url += '/' + vm.threeend;
-        axios.post(url) // Use a POST request to pass along the value -- this will be simplified in future!
-                .then(function (response) {
-                  vm.tls = response.data
-                })
+        sciris.rpcs.rpc('get_tls', [vm.sequence,vm.fiveend,vm.threeend])
+          .then(function (response) {
+            vm.tls = response.data
+        })
       },
       
       get_sequence_length: function () {
-        var url = '/api/get_sequence_length';
-        url += '/' + vm.sequence;
-        axios.post(url)
+        sciris.rpcs.rpc('get_sequence_length', [vm.sequence])
                 .then(function (response) {
                   vm.sequence_length = response.data
                 })
       },
       
       get_repl_tls: function () {
-        var url = '/api/get_repl_tls';
-        url += '/' + vm.tls;
-        url += '/' + vm.replacement_pos;
-        url += '/' + vm.replacement_base;
-        url += '/' + vm.r_twoprime;
-        url += '/' + vm.r_thiophosphoryl;
-        axios.post(url)
+        sciris.rpcs.rpc('get_repl_tls', [vm.tls, vm.replacement_pos, vm.replacement_base, vm.r_twoprime, vm.r_thiophosphoryl])
                 .then(function (response) {
                   vm.tls_replacement = response.data
                 })
       },
       
       get_replacement_length: function () {
-        var url = '/api/get_replacement_length';
-        url += '/' + vm.tls_replacement;
-        axios.post(url)
+        sciris.rpcs.rpc('get_replacement_length', [vm.tls_replacement])
                 .then(function (response) {
                   vm.tls_replacement_length = response.data
                 })
       },
       
       get_insertion_tls: function () {
-        var url = '/api/get_insertion_tls';
-        url += '/' + vm.tls;
-        url += '/' + vm.pos1;
-        url += '/' + vm.pos2;
-        url += '/' + vm.insertion_base;
-        url += '/' + vm.i_twoprime;
-        url += '/' + vm.i_thiophosphoryl;
-        axios.post(url)
+        sciris.rpcs.rpc('get_insertion_tls', [vm.tls, vm.pos1, vm.pos2, vm.insertion_base, vm.i_twoprime, vm.i_thiophosphoryl])
                 .then(function (response) {
                   vm.tls_insertion = response.data
                 })
       },
       
       get_insertion_length: function () {
-        var url = '/api/get_insertion_length';
-        url += '/' + vm.tls_insertion;
-        axios.post(url)
+        sciris.rpcs.rpc('get_insertion_length', [vm.tls_insertion])
                 .then(function (response) {
                   vm.tls_insertion_length = response.data
                 })
