@@ -6,7 +6,7 @@ import scirisweb as sw
 #%% Code part
 #####################
 
-__version__ = '0.2.2' # Specify a version
+__version__ = '0.2.3' # Specify a version
 
 def three_letter_seq(sequence, thio_end5, thio_end3):
 
@@ -108,49 +108,49 @@ def single_insertion(tls, pos1, pos2, base, twoprime, thio):
 app = sw.ScirisApp(__name__, name="RNASequenceConverter", server_port=8181) # Set to a nonstandard port to avoid collisions
 
 # Define the API for the tool
-@app.route('/get_tls/<sequence>/<fiveend>/<threeend>')
+@app.register_RPC()
 def get_tls(sequence, fiveend, threeend):
     print('get_tls() called')
     tls = three_letter_seq(sequence, fiveend, threeend)
     return tls
     
-@app.route('/get_sequence_length/<sequence>')
+@app.register_RPC()
 def get_sequence_length(sequence):
     print('get_sequence_length() called')
     length = sequence_length(sequence)
     return length
 
-@app.route('/get_repl_tls/<tls>/<replacement_pos>/<replacement_base>/<r_twoprime>/<r_thiophosphoryl>')
+@app.register_RPC()
 def get_repl_tls(tls, replacement_pos, replacement_base, r_twoprime, r_thiophosphoryl):
     print('get_repl_tls() called')
     replaced = single_replacement(tls, replacement_pos, replacement_base, r_twoprime, r_thiophosphoryl)
     return replaced
 
-@app.route('/get_replacement_length/<tls_replacement>')
+@app.register_RPC()
 def get_replacement_length(tls_replacement):
     seq = isolate_sequence(tls_replacement)
     return sequence_x_length(seq)
     
-@app.route('/get_insertion_tls/<tls>/<pos1>/<pos2>/<insertion_base>/<i_twoprime>/<i_thiophosphoryl>')
+@app.register_RPC()
 def get_insertion_tls(tls, pos1, pos2, insertion_base, i_twoprime, i_thiophosphoryl):
     print('get_insertion_tls() called')
     inserted = single_insertion(tls, pos1, pos2, insertion_base, i_twoprime, i_thiophosphoryl)
     return inserted
     
-@app.route('/get_insertion_length/<tls_insertion>')
+@app.register_RPC()
 def get_insertion_length(tls_insertion):
     seq = isolate_sequence(tls_insertion)
     return sequence_x_length(seq)
     
 
 # Get the version
-@app.route('/get_version')
+@app.register_RPC()
 def get_version():
     print('get_version() called')
     return __version__
 
 # Allow for automatic updates from GitHub
-@app.route('/gitupdate') # The URL will be e.g. rna.ocds.co/gitupdate
+@app.route('/gitupdate') # The URL for the GitHub webhook will be e.g. rna.ocds.co/gitupdate
 def git_update():
     print('git_update() called')
     from flask import request
