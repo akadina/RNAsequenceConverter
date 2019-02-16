@@ -4,9 +4,12 @@
 <!-- Load core scripts -->
 <head>
   <title>RNA Sequence Converter</title>
-  <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/sciris-js/dist/sciris-js.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://unpkg.com/vue"></script> <!-- Enable Vue -->
+  <script src="http://thekerrlab.com/tmp/d3.v5.min.js"></script> <!-- Sciris dependency -- WARNING, will want to remove in future -->
+  <script src="http://thekerrlab.com/tmp/mpld3.v0.4.1.min.js"></script> <!-- Sciris dependency -- WARNING, will want to remove in future -->
+  <script src="https://unpkg.com/sciris-js/dist/sciris-js.js"></script> <!-- Enable Sciris -->
+  <link rel="shortcut icon" href="#" />  <!-- To avoid the favicon.ico 404 -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> <!-- Enable Monserrat font -->
   <style>
     body {
       font-family: 'Montserrat', sans-serif;
@@ -152,12 +155,17 @@
         i_twoprime: 'i_vanilla',
         i_thiophosphoryl: false,
         tls_insertion: '',
-        tls_insertion_length: ''
+        tls_insertion_length: '',
+        insertion_base: '',
+        replacement_pos: '',
+        replacement_base: '',
+        pos1: '',
+        pos2: '',
       }
     },
 
     created () {
-      sciris.rpcs.rpc('get_version')
+      sciris.rpc('get_version')
         .then(function (response) {
             vm.version = response.data
         })
@@ -170,42 +178,42 @@
         if (vm.sequence === '') {
           vm.sequence = 'Please enter a sequence'
         }
-        sciris.rpcs.rpc('get_tls', [vm.sequence,vm.fiveend,vm.threeend])
+        sciris.rpc('get_tls', [vm.sequence,vm.fiveend,vm.threeend])
           .then(function (response) {
             vm.tls = response.data
         })
       },
       
       get_sequence_length: function () {
-        sciris.rpcs.rpc('get_sequence_length', [vm.sequence])
+        sciris.rpc('get_sequence_length', [vm.sequence])
                 .then(function (response) {
                   vm.sequence_length = response.data
                 })
       },
       
       get_repl_tls: function () {
-        sciris.rpcs.rpc('get_repl_tls', [vm.tls, vm.replacement_pos, vm.replacement_base, vm.r_twoprime, vm.r_thiophosphoryl])
+        sciris.rpc('get_repl_tls', [vm.tls, vm.replacement_pos, vm.replacement_base, vm.r_twoprime, vm.r_thiophosphoryl])
                 .then(function (response) {
                   vm.tls_replacement = response.data
                 })
       },
       
       get_replacement_length: function () {
-        sciris.rpcs.rpc('get_replacement_length', [vm.tls_replacement])
+        sciris.rpc('get_replacement_length', [vm.tls_replacement])
                 .then(function (response) {
                   vm.tls_replacement_length = response.data
                 })
       },
       
       get_insertion_tls: function () {
-        sciris.rpcs.rpc('get_insertion_tls', [vm.tls, vm.pos1, vm.pos2, vm.insertion_base, vm.i_twoprime, vm.i_thiophosphoryl])
+        sciris.rpc('get_insertion_tls', [vm.tls, vm.pos1, vm.pos2, vm.insertion_base, vm.i_twoprime, vm.i_thiophosphoryl])
                 .then(function (response) {
                   vm.tls_insertion = response.data
                 })
       },
       
       get_insertion_length: function () {
-        sciris.rpcs.rpc('get_insertion_length', [vm.tls_insertion])
+        sciris.rpc('get_insertion_length', [vm.tls_insertion])
                 .then(function (response) {
                   vm.tls_insertion_length = response.data
                 })
